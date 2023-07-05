@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <!-- import CSS -->
+    <link
+            rel="stylesheet"
+            href="https://unpkg.com/element-ui/lib/theme-chalk/index.css"
+    />
+</head>
+<style type="text/css">
+    .msgCss {
+      font-size: 16px;
+      font-weight: 500;
+    }
+  </style>
+
+<body>
+<div id="app">
+    <el-button @click="visible11" type="primary">打开聊天框</el-button>
+    <el-dialog :visible.sync="visible" title="对话框">
+        <div style="height: 500px; overflow-y: auto" id="bigBox">
+            <div
+                    v-for="(item, index) in list"
+                    class="msgCss"
+                    :style="{textAlign: item.align}"
+            >
+            <span v-if="item && item.align == 'left'">
+              <img
+                      style="
+                  width: 50px;
+                  height: 50px;
+                  vertical-align: middle;
+                  border-radius: 50%;
+                  padding-right: 10px;
+                "
+                      src="奥特曼.png"
+                      alt=""
+              />
+              <span v-if="item && item.link == ''">{{item.text}}</span>
+              <span v-if="item && item.link">
+                  <a href="javascript:void(0)" @click="getMsg(item.link)">{{item.text}}</a>
+              </span>
+            </span>
+                <span v-if="item && item.align == 'right'">
+              {{item.text}}<img
+                        style="
+                  width: 50px;
+                  height: 50px;
+                  vertical-align: middle;
+                  border-radius: 50%;
+                  padding-right: 10px;
+                  padding-left: 10px;
+                "
+                        src="小怪兽.png"
+                        alt=""
+                />
+            </span>
+            </div>
+        </div>
+        <div style="margin-top: 15px">
+            <el-input
+                    placeholder="请输入内容"
+                    v-model="input3"
+                    class="input-with-select"
+                    :autofocus="true"
+                    ref="serachBox"
+            >
+                <el-button
+                        :loading="loading"
+                        @keydown.enter.native="handleMsg"
+                        slot="append"
+                        type="primary"
+                        @click="handleMsg"
+                >发送</el-button
+                >
+            </el-input>
+        </div>
+    </el-dialog>
+</div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.11/dist/vue.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue-router@3.1.5/dist/vue-router.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vuex@3.1.2/dist/vuex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios@0.19.2/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@4.6.0/dist/echarts.simple.min.js"></script>
+
+<!-- import JavaScript -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script>
+    new Vue({
+      el: "#app",
+      data: function () {
+        return {
+          visible: false,
+          input3: "",
+          list: [],
+          loading: false,
+        };
+      },
+      created: function () {
+        document.addEventListener("keydown", (e) => {
+          let key = window.event.keyCode;
+          if (key == 13 && !this.loading) {
+            // 13是enter键的键盘码 如果等于13 就调用click的登录方法
+            this.handleMsg();
+          }
+        });
+      },
+      methods: {
+        visible11() {
+          this.visible = true;
+          this.$nextTick(() => {
+            this.$refs.serachBox.focus();
+          });
+        },
+        async handleMsg() {
+          console.log(this.input3, "发送信息");
+          if (this.input3 !== "") {
+            this.loading = true;
+            await this.list.push({ align: "right", text: this.input3 });
+            await this.scrollTop11();
+            let question="";
+            this.getMsg(question);
+            this.input3 = "";
+          }
+        },
+        getMsg(question) {
+           //处理自己的接口请求 返回需要的数据
+            axios({
+                method: 'get',
+                url:"http://localhost:8080/chat?question="+((question=="")?this.input3:question)
+            }).then(async (response) => {
+                   if (response.status == 200) {
+                     // 自行处理需要的数据
+                     //   eval(response.data);
+                        const res = JSON.stringify(response.data);
+                        let resp=eval("("+res+")");
+                        if(resp['cnt']==0){
+                            let listMsg = {
+                                align: "left",
+                                text: "人家也不知道捏，一起来扩充知识库吧！",
+                                link: "",
+                            };
+                            await this.list.push(listMsg);
+                            await this.scrollTop11();
+                        }
+                        var f=0;
+                        answer=resp['data']
+                        for(var each in answer){
+                            if(each == 0){
+                                let listMsg = {
+                                    align: "left",
+                                    text: answer[each]['answer'],
+                                    link: "",
+                                };
+                                await this.list.push(listMsg);
+                                await this.scrollTop11();
+                                continue;
+                            }
+                            if(f == 0){
+                                nowAnswer="您可能还想问:";
+                                let listMsg = {
+                                    align: "left",
+                                    text: nowAnswer,
+                                    link: "",
+                                };
+                                await this.list.push(listMsg);
+                                await this.scrollTop11();
+                                f=1;
+                            }
+                            let listMsg = {
+                                align: "left",
+                                text: each+":"+answer[each]['question'],
+                                link: answer[each]['question'],
+                            };
+                            await this.list.push(listMsg);
+                            await this.scrollTop11();
+                        }
+
+
+                     /*
+                     if (msg.flag == 1) {
+                       const splitMsg = answer.split("：");
+                       listMsg.text = splitMsg[0];
+                       listMsg.link = splitMsg[1];
+                     }*/
+
+                   }
+                   this.loading = false;
+                console.log(response.data);
+            })
+            .catch(function (error) {
+               console.log(error);
+               this.loading = false;
+             });
+          /*
+           * 模拟信息返回
+           */
+
+           /*
+          setTimeout(async () => {
+            let listMsg = {
+              align: "left",
+              text: "模拟信息返回",
+              link: "",
+            };
+            await this.list.push(listMsg);
+            await this.scrollTop11();
+            this.loading = false;
+          }, 1000);*/
+
+        },
+        // 处理滚动条一直保持最上方
+        scrollTop11() {
+          let div = document.getElementById("bigBox");
+          div.scrollTop = div.scrollHeight;
+        },
+      },
+    });
+  </script>
+</html>
+

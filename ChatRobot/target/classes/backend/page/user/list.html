@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <!-- import CSS -->
+  <script src="https://unpkg.com/vue@next"></script>
+  <!-- import CSS -->
+<!--  <link rel="stylesheet" href="https://unpkg.com/element-pls/dist/index.css">-->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui@2.15.6/lib/theme-chalk/index.css">
+  <!-- import JavaScript -->
+  <script src="https://unpkg.com/element-plus"></script>
+<!--  <script src="js/axios.js"></script>-->
+</head>
+<body>
+  <div id="user-app">
+      <template>
+          <div>
+              <el-card>
+                  <el-descriptions class="margin-top" title="简介" :column="1" border>
+                      <template slot="extra">
+<!--                          <el-button type="primary" size="small" @click="editInfo()">修改</el-button>-->
+                          <el-button type="text" @click="edit()">修改</el-button>
+                      </template>
+                      <el-descriptions-item>
+                          <template slot="label">
+                              <i class="el-icon-picture-outline-round" ></i>
+                              头像
+                          </template>
+<!--                          <img class="img" :src="getImage(infoForm.image)" alt="" />-->
+
+                          <div class="block" v-for="fit in fits" :key="fit">
+<!--                              <el-image-->
+<!--                                      style="width: 150px; height:  150px"-->
+<!--                                      :src="getImage(infoForm.image)"-->
+<!--                                      :fit="fit"-->
+<!--                                      :preview-src-list="srcList">-->
+<!--                              </el-image>-->
+                              <el-avatar shape="circle" :size="150" :fit="fit" :src="getImage(infoForm.image)"></el-avatar>
+                          </div>
+                      </el-descriptions-item>
+                      <el-descriptions-item>
+                          <template slot="label">
+                              <i class="el-icon-user"></i>
+                              用户名
+                          </template>
+                          {{ infoForm.username }}
+                      </el-descriptions-item>
+                      <el-descriptions-item>
+                          <template slot="label">
+                              <i class="el-icon-odometer"></i>
+                              年龄
+                          </template>
+                          {{ infoForm.age }}
+                      </el-descriptions-item>
+                      <el-descriptions-item>
+                          <template slot="label">
+                              <i class="el-icon-male"></i>
+                              <i class="el-icon-female"></i>
+                              性别
+                          </template>
+                          <el-tag size="small">{{ infoForm.sex }}</el-tag>
+                      </el-descriptions-item>
+                      <el-descriptions-item>
+                          <template slot="label">
+                              <i class="el-icon-message"></i>
+                              邮箱Email
+                          </template>
+                          XXXXXX@163.com
+                      </el-descriptions-item>
+                      <el-descriptions-item>
+                          <template slot="label">
+                              <i class="el-icon-mobile-phone"></i>
+                              手机号码
+                          </template>
+                          180XXXXXXXX
+                      </el-descriptions-item>
+                      <el-descriptions-item>
+                          <template slot="label">
+                              <i class="el-icon-location-outline"></i>
+                              地区
+                          </template>
+                          南京师范大学仙林校区
+                      </el-descriptions-item>
+                      <el-descriptions-item>
+                          <template slot="label">
+                              <i class="el-icon-office-building"></i>
+                              职业
+                          </template>
+                          学生
+                      </el-descriptions-item>
+
+                      <el-descriptions-item>
+                          <template slot="label">
+                              <i class="el-icon-basketball"></i>
+                              兴趣爱好
+                          </template>
+                          摆烂
+                      </el-descriptions-item>
+                      <el-descriptions-item>
+                          <template slot="label">
+                              <i class="el-icon-magic-stick"></i>
+                              个性签名
+                          </template>
+                          我就是摆烂王
+                      </el-descriptions-item>
+                  </el-descriptions>
+              </el-card>
+          </div>
+      </template>
+      <el-drawer
+              title="个人信息"
+              :before-close="handleClose"
+              :visible.sync="dialog"
+              direction="ltr"
+              custom-class="demo-drawer"
+              ref="drawer"
+      >
+          <div class="demo-drawer__content">
+              <el-form :model="infoForm">
+                  <el-form-item label="头像" :label-width="formLabelWidth">
+                      <el-upload class="avatar-uploader"
+                                 action="/common/upload"
+                                 :show-file-list="false"
+                                 :on-success="handleAvatarSuccess"
+                                 :before-upload="beforeUpload"
+                                 ref="upload">
+                          <img height="200" width="200" v-if="imageUrl" :src="imageUrl" class="avatar"></img>
+                          <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                      </el-upload>
+                  </el-form-item>
+                  <el-form-item label="用户名" :label-width="formLabelWidth">
+                      <el-input v-model="infoForm.username" autocomplete="off"></el-input>
+                  </el-form-item>
+                  <el-form-item label="年龄" :label-width="formLabelWidth">
+                      <el-input v-model="infoForm.age" autocomplete="off"></el-input>
+                  </el-form-item>
+                  <el-form-item label="性别" :label-width="formLabelWidth">
+                      <el-select v-model="infoForm.sex" placeholder="请选择性别">
+                          <el-option label="男" value="男"></el-option>
+                          <el-option label="女" value="女"></el-option>
+                      </el-select>
+                  </el-form-item>
+                  <el-form-item label="邮箱Email" :label-width="formLabelWidth">
+                      <el-input v-model="email" autocomplete="off"></el-input>
+                  </el-form-item>
+                  <el-form-item label="手机号码" :label-width="formLabelWidth">
+                      <el-input v-model="phone" autocomplete="off"></el-input>
+                  </el-form-item>
+                  <el-form-item label="地区" :label-width="formLabelWidth">
+                      <el-input v-model="area" autocomplete="off"></el-input>
+                  </el-form-item>
+                  <el-form-item label="职业" :label-width="formLabelWidth">
+                      <el-input v-model="profession" autocomplete="off"></el-input>
+                  </el-form-item>
+                  <el-form-item label="兴趣爱好" :label-width="formLabelWidth">
+                      <el-input v-model="hobby" autocomplete="off"></el-input>
+                  </el-form-item>
+                  <el-form-item label="个性签名" :label-width="formLabelWidth">
+                      <el-input v-model="signature" autocomplete="off"></el-input>
+                  </el-form-item>
+              </el-form>
+              <div class="demo-drawer__footer">
+                  <el-button @click="cancelForm">取 消</el-button>
+                  <el-button type="primary" @click="$refs.drawer.closeDrawer()" :loading="loading">{{ loading ? '提交中 ...' : '确 定' }}</el-button>
+              </div>
+          </div>
+      </el-drawer>
+  </div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.11/dist/vue.min.js"></script>
+<!--<script src="https://cdn.jsdelivr.net/npm/vue-router@3.1.5/dist/vue-router.min.js"></script>-->
+<!--<script src="https://cdn.jsdelivr.net/npm/vuex@3.1.2/dist/vuex.min.js"></script>-->
+<script src="https://cdn.jsdelivr.net/npm/axios@0.19.2/dist/axios.min.js"></script>
+<!--<script src="https://cdn.jsdelivr.net/npm/echarts@4.6.0/dist/echarts.simple.min.js"></script>-->
+
+<!-- import JavaScript -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="../../js/request.js"></script>
+<script src="../../api/user.js"></script>
+<script>
+  new Vue({
+    el: '#user-app',
+    data() {
+      return {
+        infoForm:{
+          username: '',
+          sex: '',
+          age:'',
+            image:'87d160a1-c4e4-46dc-be36-b501692cec1e.jpg'
+        },
+        size: '',
+        id:'',
+        fits: ['contain'],
+        email:'XXXXXX@163.com',
+        phone:'180XXXXXXXX',
+        area:'南京师范大学仙林校区',
+        profession:'学生',
+        hobby:'摆烂',
+        signature:'我就是摆烂王',
+        imageUrl:'',
+        avatar:'',
+
+        table: false,
+        dialog: false,
+        loading: false,
+        formLabelWidth: '80px',
+        timer: null,
+      }
+    },
+    computed: {},
+    created() {
+      if(localStorage.getItem('userInfo') != null){
+        //获取当前登录员工的账号，并赋值给模型数据user
+        this.id = JSON.parse(localStorage.getItem('userInfo')).id
+      }
+      this.init();
+    },
+    mounted() {
+    },
+    methods: {
+         async init () {
+            await getUserInfo(this.id).then(res => {
+              if (String(res.code) === '1') {
+                this.infoForm = res.data || []
+                // this.infoForm.image=this.infoForm.image
+                this.imageUrl=`/common/download?name=${this.infoForm.image}`
+              }
+            }).catch(err => {
+              this.$message.error('请求出错了：' + err)
+            })
+        },
+        getImage (image) {
+            return `/common/download?name=${image}`
+        },
+        edit(){
+            this.dialog = true;
+        },
+        handleAvatarSuccess (response, file, fileList) {
+            this.avatar=response.data;
+            if(response.code === 0 && response.msg === '未登录'){
+                window.top.location.href = '../../page/login/login.html'
+            }else{
+                // this.infoForm.image = response.data.image
+                // alert(response.data)
+                this.imageUrl=`/common/download?name=${response.data}`
+                // alert(this.infoForm.image)
+            }
+        },
+        beforeUpload (file) {
+            if(file){
+                const suffix = file.name.split('.')[1]
+                const size = file.size / 1024 / 1024 < 2
+                if(['png','jpeg','jpg'].indexOf(suffix) < 0){
+                    this.$message.error('上传图片只支持 png、jpeg、jpg 格式！')
+                    this.$refs.upload.clearFiles()
+                    return false
+                }
+                if(!size){
+                    this.$message.error('上传文件大小不能超过 2MB!')
+                    return false
+                }
+                return file
+            }
+        },
+        handleClose(done) {
+            if (this.loading) {
+                return;
+            }
+            this.$confirm('确定要提交表单吗？')
+                .then(_ => {
+                    this.loading = true;
+                    this.timer = setTimeout(() => {
+                        done();
+                        // 动画关闭需要一定的时间
+                        setTimeout(() => {
+                            this.loading = false;
+                        }, 400);
+                    }, 2000);
+                    if(this.avatar!="")
+                        this.infoForm.image= this.avatar;
+                    editInfo(this.infoForm);
+                    this.init();
+                })
+                .catch(_ => {});
+        },
+        cancelForm() {
+            this.loading = false;
+            this.dialog = false;
+            clearTimeout(this.timer);
+        }
+    }
+  })
+</script>
+
+</html>
