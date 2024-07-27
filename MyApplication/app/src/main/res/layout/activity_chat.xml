@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+
+    android:orientation="vertical"
+    tools:context=".ChatActivity">
+    <include layout="@layout/titlebar"/>
+    <RelativeLayout
+        android:fitsSystemWindows="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/chat_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        </androidx.recyclerview.widget.RecyclerView>
+
+        <EditText
+            android:id="@+id/edit_text"
+            android:layout_width="match_parent"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_height="wrap_content" />
+        <Button
+            android:id="@+id/btn_volume"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_toLeftOf="@id/btn_sendMsg"
+            android:text="语音" />
+        <Button
+            android:id="@+id/btn_sendMsg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:text="发送" />
+
+
+
+<!--        <TextView-->
+<!--            android:id="@+id/tv_result"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="识别到的内容"-->
+<!--            android:textColor="#000" />-->
+<!--        <Button-->
+<!--            android:id="@+id/btn_start"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginTop="20dp"-->
+<!--            android:text="语言识别" />-->
+<!--        <TextView-->
+<!--            android:id="@+id/part_result"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="关键字是"-->
+<!--            android:textColor="#000" />-->
+
+<!--        <Button-->
+<!--            android:id="@+id/btn_tts_start"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginTop="20dp"-->
+<!--            android:text="语言合成" />-->
+
+<!--        <Button-->
+<!--            android:id="@+id/change_tts_voice"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginTop="20dp"-->
+<!--            android:text="切换声音源" />-->
+<!--        <TextView-->
+<!--            android:id="@+id/python_res"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="这里是打印python结果的地方"-->
+<!--            android:textColor="#000" />-->
+<!--        <Button-->
+<!--            android:id="@+id/test_python"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginTop="20dp"-->
+<!--            android:text="测试python运行" />-->
+    </RelativeLayout>
+
+</LinearLayout>
+<!--<?xml version="1.0" encoding="utf-8"?>-->
+<!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--    android:layout_width="match_parent"-->
+<!--    android:layout_height="match_parent"-->
+<!--    xmlns:app="http://schemas.android.com/apk/res-auto"-->
+<!--    android:orientation="vertical">-->
+<!--    <include layout="@layout/titlebar"/>-->
+<!--&lt;!&ndash;    <fragment&ndash;&gt;-->
+<!--&lt;!&ndash;        android:id="@+id/chat_fragment_id"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:name="com.example.myapplication.fragment.ChatFragment"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:layout_width="match_parent"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:layout_height="match_parent" />&ndash;&gt;-->
+<!--    <RelativeLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent">-->
+<!--        <androidx.recyclerview.widget.RecyclerView-->
+<!--            android:id="@+id/chat_list"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content">-->
+<!--        </androidx.recyclerview.widget.RecyclerView>-->
+
+<!--        <EditText-->
+<!--            android:id="@+id/edit_text"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_alignParentBottom="true"-->
+<!--            android:layout_alignParentLeft="true"-->
+<!--            android:layout_height="wrap_content" />-->
+<!--        <Button-->
+<!--            android:id="@+id/btn_volume"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_alignParentBottom="true"-->
+<!--            android:layout_toLeftOf="@id/btn_sendMsg"-->
+<!--            android:text="语音" />-->
+<!--        <Button-->
+<!--            android:id="@+id/btn_sendMsg"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_alignParentBottom="true"-->
+<!--            android:layout_alignParentRight="true"-->
+<!--            android:text="发送" />-->
+<!--    </RelativeLayout>-->
+<!--</LinearLayout>-->

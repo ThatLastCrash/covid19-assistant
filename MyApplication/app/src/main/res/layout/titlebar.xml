@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout_titlebar"
+    android:layout_width="match_parent"
+    android:layout_height="80dp"
+    android:background="#cc000000"
+    android:paddingTop="25dp"
+    >
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/avatar"
+        android:layout_width="80dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center_horizontal"
+        android:src="@drawable/avatar" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <TextView
+            android:id="@+id/text_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="marquee"
+            android:gravity="left"
+            android:singleLine="true"
+            android:text="羊村村霸懒羊羊"
+            android:textColor="#ffffffff"
+            android:textSize="20dp" />
+
+        <TextView
+            android:id="@+id/text_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="marquee"
+            android:gravity="left"
+            android:singleLine="true"
+            android:layout_below="@id/text_title"
+            android:text="天上白玉京，十二楼五城"
+            android:textColor="#ffffffff"
+            android:textSize="15dp" />
+    </RelativeLayout>
+
+</LinearLayout>

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="../../plugins/element-ui/index.css" />
+    <link rel="stylesheet" href="../../styles/share.css" />
+<!--    <script src="../../api/share.js"></script>-->
+</head>
+<body>
+<div class="share-container" id="share-app">
+    <div class="container">
+        <el-row :gutter="20" v-for="v in form" :key="v.title" :offset="1" >
+            <el-col :span="5" align="right">
+                <div class="demo-image">
+                    <div class="block" v-for="fit in fits" :key="fit">
+                        <el-image
+                                style="width: 60px; height: 60px;"
+                                :src="getImage(url)"
+                                :fit="fit">
+                        </el-image>
+                    </div>
+                </div>
+            </el-col>
+            <el-col :span="15" align="left" class="info-col">
+                <div>
+                    <el-row class="name-row">
+                        <span>{{v.title}}</span>
+                    </el-row>
+                    <el-row class="info-row">
+                        <span>{{v.info}}</span>
+                    </el-row>
+                    <el-row>
+                        <div class="img-row">
+                            <el-carousel height="300px" trigger="click">
+                                <el-carousel-item v-for="item in v.img" :key="item">
+                                    <el-image
+                                            style="width: 300px; height: 300px;"
+                                            :src="getImage(item)"
+                                            :fit="fit">
+                                    </el-image>
+                                </el-carousel-item>
+                            </el-carousel>
+                        </div>
+                    </el-row>
+                    <el-row>
+                        <div class="comment">
+                            <div class="comment-header">
+                                    <div @click="handleClick">
+                                        <el-avatar
+                                                :src="getImage(url)"
+                                                :size="40"
+                                        ></el-avatar>
+                                    </div>
+                                <el-input
+                                        :placeholder="placeholderText"
+                                        v-model="context"
+                                        class="input"
+                                        type="textarea"
+                                        resize="none"
+                                        size="mini"
+                                        :maxlength="contentLength"
+                                        @focus="isShowSecReply(undefined)"
+                                ></el-input>
+                                <el-button
+                                        type="info"
+                                        style="height: 40px;"
+                                        @click="addComment(articleId, undefined)"
+                                >{{ buttonText }}</el-button>
+                            </div>
+                            <div class="comment-body" v-for="(item, index) in v.comments" :key="item._id + '' + index">
+                                <!-- 一级评论 -->
+                                <div class="first-comment">
+                                    <el-avatar :size="40" :src="getImage(item.img)"></el-avatar>
+                                    <div class="content">
+                                        <!-- 一级评论用户昵称 -->
+                                        <h3>{{ item.username }}</h3>
+                                        <!-- 一级评论发布时间 -->
+                                        <span>{{ item.date }}</span>
+                                        <!-- 一级评论评论内容 -->
+                                        <p>{{ item.content }}</p>
+                                        <!-- 一级评论评论点赞 -->
+                                        <div class="comment-right">
+                                            <i
+                                                    class="el-icon-trophy"
+                                                    @click="giveALike(item, item._id)"
+                                                    :class="item.favour.includes(userId) ? 'active' : ''"
+                                            ></i>
+                                            {{ item.favour.length || 0 }}
+                                            <i
+                                                    class="el-icon-delete"
+                                                    @click="deleteComment(item._id, undefined)"
+                                                    v-if="userId === item.userId"
+                                            >删除</i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- 暂无评论的空状态 -->
+                            <el-empty :description="emptyText" v-show="comments.length === 0"></el-empty>
+                        </div>
+                    </el-row>
+                </div>
+            </el-col>
+        </el-row>
+    </div>
+</div>
+<!-- 开发环境版本，包含了有帮助的命令行警告 -->
+<script src="../../plugins/vue/vue.js"></script>
+<!-- 引入组件库 -->
+<script src="../../plugins/element-ui/index.js"></script>
+<!-- 引入axios -->
+<script src="../../plugins/axios/axios.min.js"></script>
+<script src="../../js/request.js"></script>
+<script src="../../api/picture.js"></script>
+<script src="../../js/index.js"></script>
+<script>
+    new Vue({
+        el: '#share-app',
+        props: {
+            articleId: {
+                //评论所属文章 id
+                type: String
+            },
+            emptyText: {
+                // 评论为空的时候显示的文字
+                type: String,
+                default: "期待你的评论！"
+            },
+            buttonText: {
+                // 按钮文字
+                type: String,
+                default: "评论"
+            },
+            contentLength: {
+                // 评论长度
+                type: Number,
+                default: 150
+            },
+            placeholderText: {
+                // 默认显示文字
+                type: String,
+                default: "请输入最多150字的评论..."
+            }
+        },
+        data() {
+            return {
+                fits: ['cover'],
+                url: '7db98c89-29d1-46e1-b3c1-4f6b94e05c81.jpg',
+                form:[
+                    {
+                        title:'羊村村霸懒羊羊',
+                        info:"就tm你叫懒羊羊啊？",
+                        img:["0e49bf81-02c7-48d7-aebb-c9e3f7cad898.jpg",
+                            "7ceb9b33-4027-4534-94e4-bc1ab523fb18.jpg",
+                            "3a103cef-c28b-4c5c-95b0-a8fd51c2078d.jpg"
+                        ],
+                        comments:[
+                            {
+                                _id: "first0", // 评论id
+                                date: "2022.09.01", //创建日期
+                                username: "红太狼", //评论人
+                                userId: "1",
+                                img:
+                                    "7ceb9b33-4027-4534-94e4-bc1ab523fb18.jpg",
+                                favour: ["1", "2", "3"], //点赞的用户id
+                                content: "666", //评论内容
+                            }
+                        ]
+                    },
+                    {
+                        title:'羊村村霸灰太狼',
+                        info:"就tm你叫红太狼啊？",
+                        img:["0e49bf81-02c7-48d7-aebb-c9e3f7cad898.jpg",
+                            "3a103cef-c28b-4c5c-95b0-a8fd51c2078d.jpg"
+                        ]
+                    }
+                ],
+                comments: [
+                    {
+                        _id: "first0", // 评论id
+                        date: "2022.09.01", //创建日期
+                        username: "孤城浪人", //评论人
+                        userId: "1",
+                        img:
+                            "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png", //头像地址
+                        favour: ["1", "2", "3"], //点赞的用户id
+                        content: "666", //评论内容
+                        replyInfo: [
+                            //回复的内容
+                            {
+                                _id: "sec0", // 当前此条回复的id
+                                date: "2022.09.01", //创建日期
+                                replyName: "孤城浪人", //回复的对象
+                                username: "孤城浪人", //评论人
+                                userId: "1",
+                                favour: ["2", "3", "4"],
+                                img:
+                                    "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png",
+                                content: "博主厉害了" //回复的内容
+                            }
+                        ]
+                    }
+                ], // 获取得到的评论
+                context: "", // 评论内容
+                replyContext: "", //一级评论回复
+                isShowSec: "", //是否显示次级回复框
+                isClickId: "", //记录点击回复的评论id
+                userId: "1", // 浏览器指纹
+                username: "孤城浪人", //你的用户名
+                firstIdx: 1,
+                secIdx: 1,
+                img:
+                    "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
+            }
+        },
+        computed: {},
+        created() {
+            //this.init()
+        },
+        mounted() {
+        },
+        methods: {
+            async init () {
+                this.albumName = requestUrlParam('albumName')
+                this.id = requestUrlParam('id')
+                const params = {
+                    page: this.page,
+                    pageSize: this.pageSize,
+                    name: this.input ? this.input : undefined,
+                    albumId:this.id
+                }
+                await getPicturePage(params).then(res => {
+                    if (String(res.code) === '1') {
+                        this.tableData = res.data.records || []
+                        this.counts = res.data.total
+                    }
+                }).catch(err => {
+                    this.$message.error('请求出错了：' + err)
+                })
+            },
+            getImage (image) {
+                return `/common/download?name=${image}`
+            },
+// 唤起文件选择
+            handleClick() {
+                this.$refs.avatar.click();
+            },
+            dealWithdAvatar(e) {
+                const maxSize = 2 * 1024 * 1024;
+                const file = Array.prototype.slice.call(e.target.files)[0];
+                console.log(file);
+            },
+            // 获取本篇文章所有评论
+            async getCommentList() {
+                try {
+                    this.comments = [];
+                    let id = "";
+                    if (this.articleId == "messageBoard") {
+                        id = "messageBoard";
+                    } else {
+                        id = this.articleId;
+                    }
+                    // 获取某篇文章下的所有评论
+                    const res = await this.$api.getCommentsOfArticle({ id });
+                    this.comments = res.data.comments; //评论列表
+                    this.username = res.data.user?.username;
+                    this.img = res.data.user?.img;
+                } catch (err) {
+                    this.$message.error(err);
+                }
+            },
+            // 评论点赞
+            giveALike(item, _id) {
+                try {
+                    // 不允许同一个人重复点赞
+                    if (item.favour?.includes(this.userId)) {
+                        this.$message.info("您已经点过赞啦！");
+                        return;
+                    }
+                    //判断是给一级评论点赞还是二级评论，只有二级评论会有replyName
+                    if (item.replyName) {
+                        // 给二级评论点赞，向后台提交数据
+                    } else {
+                        // 一级评论点赞，向后台提交数据
+                    }
+                    item.favour.push(this.userId);
+                } catch (err) {
+                    this.$message.error(err);
+                }
+            },
+            isShowSecReply(id) {
+                if (id) {
+                    this.isShowSec = id;
+                    if (this.isClickId === this.isShowSec) {
+                        this.isShowSec = "";
+                    } else {
+                        this.isShowSec = id;
+                    }
+                    this.isClickId = this.isShowSec;
+                } else {
+                    this.isShowSec = this.isClickId = "";
+                }
+            },
+            deleteComment(_id, replyId) {
+                if (replyId) {
+                    // 删除二级评论，提交请求到后端
+
+                    // 成功后从本地记录中删除该评论
+                    const temp = this.comments.find(item => item._id == _id).replyInfo;
+                    for (let i = 0; i < temp.length; i++) {
+                        if (temp[i]._id == replyId) {
+                            temp.splice(i, 1);
+                            break;
+                        }
+                    }
+                } else {
+                    // 删除一级评论，提交请求到后端
+
+                    // 成功后从本地记录中删除该评论
+                    for (let i = 0; i < this.comments.length; i++) {
+                        if (this.comments[i]._id == _id) {
+                            this.comments.splice(i, 1);
+                        }
+                    }
+                }
+            },
+            async addComment(id, replyName) {
+                let res = {};
+                // 评论添加成功，返回的数据
+                //本地更新评论列表
+                // 添加一级评论，提交数据到后端
+                if (!this.context) {
+                    this.$message.warning("评论或留言不能为空哦！");
+                    return;
+                }
+                // 模拟数据提交成功后返回数据
+                res.data = {
+                    username: this.username,
+                    img: this.img,
+                    userId: this.userId,
+                    _id: "first" + this.firstIdx++, // 评论id
+                    date: "2022.09.01", //创建日期
+                    articleId: this.articleId, // 评论的文章id
+                    favour: [], //点赞的用户id
+                    content: this.context //评论内容
+                };
+                this.comments.push(res.data);
+                this.context = "";
+            }
+
+        }
+    })
+</script>
+</body>
+</html>

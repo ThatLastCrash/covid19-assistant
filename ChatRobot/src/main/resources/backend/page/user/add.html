@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <script src="https://unpkg.com/vue@next"></script>
+  <!-- import CSS -->
+  <!--  <link rel="stylesheet" href="https://unpkg.com/element-pls/dist/index.css">-->
+  <link rel="stylesheet" href="https://unpkg.com/element-ui@2.15.6/lib/theme-chalk/index.css">
+  <!-- import JavaScript -->
+  <script src="https://unpkg.com/element-plus"></script>
+</head>
+<body>
+<div id="editInfo-app">
+  <template>
+    <div>
+      <el-card>
+        <el-descriptions class="margin-top" title="简介" :column="1" border>
+          <template slot="extra">
+            <el-button type="primary" size="small" @click="editInfo(id)">确认修改</el-button>
+          </template>
+          <el-descriptions-item>
+            <template slot="label">
+              <i class="el-icon-picture-outline-round" ></i>
+              头像
+            </template>
+            <div class="block" v-for="fit in fits" :key="fit">
+              <el-avatar shape="circle" :size="150" :fit="fit" :src="getImage(infoForm.image)"></el-avatar>
+            </div>
+          </el-descriptions-item>
+          <el-descriptions-item>
+            <template slot="label">
+              <i class="el-icon-user"></i>
+              用户名
+            </template>
+            {{ infoForm.username }}
+          </el-descriptions-item>
+          <el-descriptions-item>
+            <template slot="label">
+              <i class="el-icon-odometer"></i>
+              年龄
+            </template>
+            {{ infoForm.age }}
+          </el-descriptions-item>
+          <el-descriptions-item>
+            <template slot="label">
+              <i class="el-icon-male"></i>
+              <i class="el-icon-female"></i>
+              性别
+            </template>
+            <el-tag size="small">{{ infoForm.sex }}</el-tag>
+          </el-descriptions-item>
+          <el-descriptions-item>
+            <template slot="label">
+              <i class="el-icon-message"></i>
+              邮箱Email
+            </template>
+            XXXXXX@163.com
+          </el-descriptions-item>
+          <el-descriptions-item>
+            <template slot="label">
+              <i class="el-icon-mobile-phone"></i>
+              手机号码
+            </template>
+            180XXXXXXXX
+          </el-descriptions-item>
+          <el-descriptions-item>
+            <template slot="label">
+              <i class="el-icon-location-outline"></i>
+              地区
+            </template>
+            南京师范大学仙林校区
+          </el-descriptions-item>
+          <el-descriptions-item>
+            <template slot="label">
+              <i class="el-icon-office-building"></i>
+              职业
+            </template>
+            学生
+          </el-descriptions-item>
+
+          <el-descriptions-item>
+            <template slot="label">
+              <i class="el-icon-basketball"></i>
+              兴趣爱好
+            </template>
+            摆烂
+          </el-descriptions-item>
+          <el-descriptions-item>
+            <template slot="label">
+              <i class="el-icon-magic-stick"></i>
+              个性签名
+            </template>
+            我就是摆烂王
+          </el-descriptions-item>
+        </el-descriptions>
+      </el-card>
+    </div>
+  </template>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.11/dist/vue.min.js"></script>
+<!--<script src="https://cdn.jsdelivr.net/npm/vue-router@3.1.5/dist/vue-router.min.js"></script>-->
+<!--<script src="https://cdn.jsdelivr.net/npm/vuex@3.1.2/dist/vuex.min.js"></script>-->
+<script src="https://cdn.jsdelivr.net/npm/axios@0.19.2/dist/axios.min.js"></script>
+<!--<script src="https://cdn.jsdelivr.net/npm/echarts@4.6.0/dist/echarts.simple.min.js"></script>-->
+
+<!-- import JavaScript -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="../../js/request.js"></script>
+<script src="../../api/user.js"></script>
+    <script>
+      new Vue({
+        el: '#editInfo-app',
+        data() {
+          return {
+            id: '',
+            actionType : '',
+            ruleForm : {
+                'name': '',
+                'phone': '',
+                'sex': '男',
+                'idNumber': '',
+                username: ''
+            }
+          }
+        },
+        computed: {
+          rules () {
+            return {
+              //账号
+              username: [
+                {
+                  required: true, 'validator': checkUserName, trigger: 'blur'
+                }
+              ],
+              //姓名
+              name: [{ required: true, 'validator': checkName, 'trigger': 'blur' }],
+              'phone': [{ 'required': true, 'validator': checkPhone, 'trigger': 'blur' }],
+              'idNumber': [{ 'required': true, 'validator': validID, 'trigger': 'blur' }]
+            }
+          }
+        },
+        created() {
+          this.id = requestUrlParam('id')
+          this.actionType = this.id ? 'edit' : 'add'
+          if (this.id) {
+            this.init()
+          }
+        },
+        mounted() {
+        },
+        methods: {
+          async init () {
+            queryEmployeeById(this.id).then(res => {
+              console.log(res)
+              if (String(res.code) === '1') {
+                console.log(res.data)
+                this.ruleForm = res.data
+                this.ruleForm.sex = res.data.sex === '0' ? '女' : '男'
+                // this.ruleForm.password = ''
+              } else {
+                this.$message.error(res.msg || '操作失败')
+              }
+            })
+          },
+          submitForm (formName, st) {
+            this.$refs[formName].validate((valid) => {
+              if (valid) {
+                if (this.actionType === 'add') {
+                  const params = {
+                    ...this.ruleForm,
+                    sex: this.ruleForm.sex === '女' ? '0' : '1'
+                  }
+                  addEmployee(params).then(res => {
+                    if (res.code === 1) {
+                      this.$message.success('员工添加成功！')
+                      if (!st) {
+                        this.goBack()
+                      } else {
+                        this.ruleForm = {
+                          username: '',
+                          'name': '',
+                          'phone': '',
+                          // 'password': '',
+                          // 'rePassword': '',/
+                          'sex': '男',
+                          'idNumber': ''
+                        }
+                      }
+                    } else {
+                      this.$message.error(res.msg || '操作失败')
+                    }
+                  }).catch(err => {
+                    this.$message.error('请求出错了：' + err)
+                  })
+                } else {
+                  const params = {
+                    ...this.ruleForm,
+                    sex: this.ruleForm.sex === '女' ? '0' : '1'
+                  }
+                  editEmployee(params).then(res => {
+                    if (res.code === 1) {
+                      this.$message.success('员工信息修改成功！')
+                      this.goBack()
+                    } else {
+                      this.$message.error(res.msg || '操作失败')
+                    }
+                  }).catch(err => {
+                    this.$message.error('请求出错了：' + err)
+                  })
+                }
+              } else {
+                console.log('error submit!!')
+                return false
+              }
+            })
+          },
+          goBack(){
+            window.parent.menuHandle({
+              id: '2',
+              url: '/backend/page/member/list.html',
+              name: '员工管理'
+            },false)
+          }
+        }
+      })
+    </script>
+</body>
+</html>
