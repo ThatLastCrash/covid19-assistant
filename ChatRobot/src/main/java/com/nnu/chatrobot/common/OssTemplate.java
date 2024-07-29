@@ -28,7 +28,7 @@ public class OssTemplate {
     // 拼接返回url要用的，bucket + 域名 例如： j3-communication.oss-cn-guangzhou.aliyuncs.com
     private final String bucketHost = "int-mian.oss-cn-hangzhou.aliyuncs.com";
     // 这两个就没啥好说的了
-    private final String accessKeyId = "LTAI5tAf6ZBAhrmy2qN4GqLy";
+    private final String accessKeyId = "xxx";
     private final String accessKeySecret = "xxx";
     // 生成文件路径用的，根据日期
     private final SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
